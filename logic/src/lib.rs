@@ -115,8 +115,9 @@ pub struct PerpetualOrderBook {
     min_margin: f64,
     max_leverage: f64,
 }
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd, BorshSerialize, BorshDeserialize, Serialize)]
+#[borsh(crate = "calimero_sdk::borsh")]
+#[serde(crate = "calimero_sdk::serde")]
 pub enum OrderError {
     InsufficientMargin,
     ExceedsMaxLeverage,
