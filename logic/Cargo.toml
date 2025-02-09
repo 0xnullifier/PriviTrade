@@ -1,0 +1,31 @@
+[package]
+name = "increment"
+description = "Calimero increment/decrement application"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bellman = { version = "0.14.0", features = ["pairing"] }
+bls12_381 = "0.8.0"
+calimero-sdk = { git = "https://github.com/calimero-network/core" }
+calimero-storage = { git = "https://github.com/calimero-network/core" }
+ff = "0.13.0"
+pairing = "0.23.0"
+rand = "0.8.0"
+rand_core = "0.6"
+getrandom = { version = "0.2", features = ["js"] }
+sha2 = "0.10.8"
+bn254 = "0.0.1"
+hex = "0.4.3"
+[profile.app-release]
+inherits = "release"
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
