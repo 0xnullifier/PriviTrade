@@ -708,4 +708,64 @@ impl AppState {
 
         Ok(())
     }
+
+    pub fn create_perpetual_order_book(
+        &mut self,
+        token_id: TokenId,
+        initial_mark_price: f64,
+        min_margin: f64,
+        max_leverage: f64,
+    ) -> Result<(), Error> {
+        let order_book = PerpetualOrderBook::new(initial_mark_price, min_margin, max_leverage);
+        self.perpetual_order_book.insert(token_id, order_book)?;
+        Ok(())
+    }
+
+    pub fn place_order(
+        &mut self,
+        token_id: TokenId,
+        order: Order,
+        margin: f64,
+    ) -> Result<Vec<Trade>, OrderError> {
+        let mut order_book = self
+            .perpetual_order_book
+            .get(&token_id)
+            .map_err(|_| OrderError::OrderNotFound)?
+            .ok_or(OrderError::OrderNotFound)?;
+        let trades = order_book.place_order(order, margin)?;
+        self.perpetual_order_book
+            .insert(token_id, order_book)
+            .map_err(|_| OrderError::OrderNotFound)?;
+        Ok(trades)
+    }
+
+    pub fn update_mark_price(
+        &mut self,
+        token_id: TokenId,
+        new_mark_price: f64,
+    ) -> Result<Vec<u64>, OrderError> {
+        let mut order_book = self
+            .perpetual_order_book
+            .get(&token_id)
+            .map_err(|_| OrderError::OrderNotFound)?
+            .ok_or(OrderError::OrderNotFound)?;
+        let liquidated_traders = order_book.update_mark_price(new_mark_price);
+        self.perpetual_order_book
+            .insert(token_id, order_book)
+            .map_err(|_| OrderError::OrderNotFound)?;
+        Ok(liquidated_traders)
+    }
+
+    pub fn update_funding_rate(&mut self, token_id: TokenId) -> Result<(), OrderError> {
+        let mut order_book = self
+            .perpetual_order_book
+            .get(&token_id)
+            .map_err(|_| OrderError::InvalidPrice)?
+            .ok_or(OrderError::OrderNotFound)?;
+        order_book.update_funding_rate();
+        self.perpetual_order_book
+            .insert(token_id, order_book)
+            .map_err(|_| OrderError::InvalidPrice)?;
+        Ok(())
+    }
 }
