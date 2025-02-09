@@ -671,8 +671,6 @@ impl AppState {
         Ok(proposal_id)
     }
 
-    pub fn create_order() {}
-
     pub fn approve_proposal(&self, proposal_id: ProposalId) -> Result<(), Error> {
         // fixme: should we need to check this?
         // self.messages

@@ -1,5 +1,0 @@
-[workspace]
-members = [
-    "src/plonk_verifier_on_icp_backend"
-]
-resolver = "2"
